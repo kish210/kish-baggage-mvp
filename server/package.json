@@ -1,6 +1,6 @@
 {
-  "name": "kish-baggage-server",
-  "version": "1.0.0",
+  "name": "kish-baggage-mvp",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "node src/index.js"

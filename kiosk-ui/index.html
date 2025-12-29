@@ -1,15 +1,87 @@
-
 <!doctype html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kish Baggage Kiosk (MVP)</title>
+  <style>
+    body{font-family:Arial, sans-serif; margin:24px;}
+    .row{margin:10px 0;}
+    label{display:block; font-size:12px; margin-bottom:4px;}
+    input{width:420px; padding:8px;}
+    button{padding:10px 14px; cursor:pointer;}
+    pre{background:#f6f6f6; padding:12px; overflow:auto; max-width:100%;}
+  </style>
+</head>
 <body>
-<h3>Kish Baggage Kiosk</h3>
-<input id="t" placeholder="TRACK-ID"/>
-<button onclick="go()">Generate ZPL</button>
-<pre id="o"></pre>
+  <h2>Kish Baggage Kiosk (MVP)</h2>
+
+  <div class="row">
+    <label>Server URL</label>
+    <input id="server" value="http://localhost:8080" />
+  </div>
+
+  <div class="row">
+    <label>API Key (x-api-key)</label>
+    <input id="apikey" placeholder="change_me_to_a_strong_key" />
+  </div>
+
+  <div class="row">
+    <label>Hotel Name</label>
+    <input id="hotel" value="PALACE HOTEL" />
+  </div>
+
+  <div class="row">
+    <label>Guest/Leader Name</label>
+    <input id="name" value="SEYED ALI MOUSAVI" />
+  </div>
+
+  <div class="row">
+    <label>Bags Total</label>
+    <input id="bagsTotal" value="3" />
+  </div>
+
+  <div class="row">
+    <label>Bag Index</label>
+    <input id="bagIndex" value="1" />
+  </div>
+
+  <div class="row">
+    <label>DPI (203 or 300)</label>
+    <input id="dpi" value="203" />
+  </div>
+
+  <button onclick="gen()">Generate ZPL</button>
+
+  <h3>Output</h3>
+  <div id="meta"></div>
+  <pre id="out"></pre>
+
 <script>
-async function go(){
- const r=await fetch("http://localhost:8080/print",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({trackId:t.value,hotel:'PALACE HOTEL'})});
- o.textContent=(await r.json()).zpl;
+async function gen(){
+  const url = document.getElementById('server').value.replace(/\/$/,'') + '/api/print';
+  const body = {
+    hotelName: document.getElementById('hotel').value,
+    displayName: document.getElementById('name').value,
+    bagsTotal: Number(document.getElementById('bagsTotal').value),
+    bagIndex: Number(document.getElementById('bagIndex').value),
+    dpi: Number(document.getElementById('dpi').value),
+    from: "KIH"
+  };
+
+  const r = await fetch(url, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': document.getElementById('apikey').value
+    },
+    body: JSON.stringify(body)
+  });
+
+  const j = await r.json();
+  if(!r.ok){ out.textContent = JSON.stringify(j,null,2); meta.textContent=''; return; }
+  meta.textContent = `TRACK-ID: ${j.trackId} | DPI: ${j.dpi}`;
+  out.textContent = j.zpl;
 }
 </script>
 </body>
