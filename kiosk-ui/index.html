@@ -1,0 +1,16 @@
+
+<!doctype html>
+<html>
+<body>
+<h3>Kish Baggage Kiosk</h3>
+<input id="t" placeholder="TRACK-ID"/>
+<button onclick="go()">Generate ZPL</button>
+<pre id="o"></pre>
+<script>
+async function go(){
+ const r=await fetch("http://localhost:8080/print",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({trackId:t.value,hotel:'PALACE HOTEL'})});
+ o.textContent=(await r.json()).zpl;
+}
+</script>
+</body>
+</html>
